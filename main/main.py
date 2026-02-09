@@ -21,7 +21,27 @@ class IcmpPacketSender:
         # Set socket timeout
         sock.settimeout(2)
 
-        ip_header = b'\x45\x00\x00\x54\x18\x0e\x40\x00\x40\x01\x24\x99\x7f\x00\x00\x01\x7f\x00\x00\x01'
+        ip_version_IHL = b'\x45'
+        ip_DSCP_ECN = b'\x60'
+        ip_length = b'\x00\x54'
+        ip_ID = b'\x00\x00'
+        ip_flags_offset = b'\x00\x00'
+        ip_ttl = b'\x40'
+        ip_protocol = b'\x01'
+        ip_checksum = b'\xa1\x79'
+        ip_source = b'\xc0\xa8\x00\x02'
+        ip_destination = b'\xc0\xa8\x00\x03'
+        
+        ip_header = ip_version_IHL
+        ip_header += ip_DSCP_ECN
+        ip_header += ip_length
+        ip_header += ip_ID
+        ip_header += ip_flags_offset
+        ip_header += ip_ttl
+        ip_header += ip_protocol
+        ip_header += ip_checksum
+        ip_header += ip_source
+        ip_header += ip_destination
 
 
         icmp_type = 8  # ICMP echo request
