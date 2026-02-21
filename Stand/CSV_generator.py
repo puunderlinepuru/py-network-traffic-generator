@@ -3,12 +3,14 @@ import csv
 from scapy.all import *
 import json
 
-data = [[]]
+data = [["src", "dst", "id", "checksum", "ipv4_src"]]
 
 print("Starting sniffer...")
 
+count = 100
+
 # Sniff 5 packets and then stop
-packets = sniff(prn=lambda x: x.summary(), count=100, iface="Ethernet")
+packets = sniff(prn=lambda x: x.summary(), count=count, iface="Ethernet")
 
 print("Sniffing complete. Packets captured:")
 # packets.summary()
@@ -19,7 +21,7 @@ print("Sniffing complete. Packets captured:")
 for packet in packets:
     json_packet = packet.json()
     packet_disass = json.loads(json_packet)
-    data.append([packet_disass['src'], packet_disass['dst'], packet_disass['payload']['id']])
+    data.append([packet_disass['src'], packet_disass['dst'], packet_disass['payload']['id'], packet_disass['payload']['chksum'],packet_disass['payload']['src']])
 
 # try:
 #     print(packet_disass["id"])
@@ -37,8 +39,12 @@ for packet in packets:
 #         print(packet_disass['payload']['id'])
 #     choice = input("Press Enter to exit")
 
+resource_path = r'./generated'
+if not os.path.exists(resource_path):
+    os.makedirs(resource_path)
+
 # File path for the CSV file
-csv_file_path = 'example.csv'
+csv_file_path = f"generated/capture.csv"
 
 # Open the file in write mode
 with open(csv_file_path, mode='w', newline='') as file:

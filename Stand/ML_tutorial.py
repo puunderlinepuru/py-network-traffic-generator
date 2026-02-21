@@ -41,13 +41,13 @@ from sklearn.svm import SVC
 
 ...
 # Load dataset
-url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/iris.csv"
-names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'class']
+# url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/iris.csv"
+# names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'class']
 
-url = "example.csv"
+url = "./generated/formatted_capture.csv"
 names = ['src', 'dst', 'id']
 
-dataset = read_csv(url, names=names)
+dataset = read_csv(url, names=names, header=1)
 
 ...
 # shape
@@ -57,7 +57,7 @@ dataset = read_csv(url, names=names)
 # head
 # print(dataset.head(20))
 
-...[]
+...
 # descriptions
 # print(dataset.describe())
 

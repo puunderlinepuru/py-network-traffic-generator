@@ -18,15 +18,20 @@ from sklearn.model_selection import train_test_split
 # Start by creating a dataset using generate_data() from pyod
 # X_train, y_train = generate_data(train_only=True)
 
-url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/iris.csv"
-names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'class']
+# url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/iris.csv"
+# names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'class']
 
-dataset = read_csv(url, names=names)
+url = "./generated/formatted_capture.csv"
+# names = ['src', 'dst', 'id', 'checksum',]
+
+dataset = read_csv(url)
 
 array = dataset.values
 
-X = array[:,0:4]
+X = array[:,3:4]
 y = array[:,4]
+
+
 print(X)
 print(y)
 
