@@ -1,32 +1,37 @@
-# importing csv
+
+
+import sys
 import csv
 from scapy.all import *
 import json
+
+# Define whether script is run from Win or Linux
+if (sys.argv[1] == 'pc'):
+    interface = 'Ethernet'
+elif (sys.argv[1] == 'laptop'):
+    interface = 'wlan0'
 
 data = [["src", "dst", "id", "checksum", "ipv4_src"]]
 
 print("Starting sniffer...")
 
-count = 100
+count = int(sys.argv[2]) or 100
+print(f'capturing {count} packets')
 
-# Sniff 5 packets and then stop
-packets = sniff(prn=lambda x: x.summary(), count=count, iface="Ethernet")
+
+packets = sniff(prn=lambda x: x.summary(), count=count, iface=interface)
 
 print("Sniffing complete. Packets captured:")
-# packets.summary()
-# json_packet = packets[0].json()
-# packet_disass = json.loads(json_packet)
 
 
 for packet in packets:
     json_packet = packet.json()
     packet_disass = json.loads(json_packet)
-    data.append([packet_disass['src'], packet_disass['dst'], packet_disass['payload']['id'], packet_disass['payload']['chksum'],packet_disass['payload']['src']])
-
-# try:
-#     print(packet_disass["id"])
-# except:
-#     print("wrong")
+    try:
+        data.append([packet_disass['src'], packet_disass['dst'], packet_disass['payload']['id'], packet_disass['payload']['chksum'],packet_disass['payload']['src']])
+    except:
+        print('ERROR')
+        print(packet_disass)
 
 
 # choice = input("Press Enter to exit")
