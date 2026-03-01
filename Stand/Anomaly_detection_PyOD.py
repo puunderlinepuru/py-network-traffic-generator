@@ -57,10 +57,19 @@ clf.fit(X_train)
 y_train_pred = clf.labels_
 y_train_scores = clf.decision_scores_
 
-ax = sns.scatterplot(x=0, y=1, hue=y_train_scores, data=df_train, palette="RdBu_r")
+print("Predictions:")
+for prediction in clf.labels_:
+    print(prediction)
+
+print("Decision scores:")
+for decision in clf.decision_scores_:
+    print(decision)
+
+# ax = sns.scatterplot(x=0, y=1, hue=y_train_scores, data=df_train, palette="RdBu_r")
+displot = sns.displot(df_train)
 
 # Using legends, results look bit varied
 legend_labels = [f"{score:.2f}" for score in np.unique(y_train_scores)]  # Format scores up to 2 decimal places
-ax.legend(title="Anomaly Scores", labels=legend_labels)  # Create legend with title and labels
+# ax.legend(title="Anomaly Scores", labels=legend_labels)  # Create legend with title and labels
 plt.title('Anomaly Scores by PCA')
 plt.show()
