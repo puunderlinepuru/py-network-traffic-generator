@@ -22,13 +22,16 @@ from sklearn.model_selection import train_test_split
 # names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'class']
 
 url = "./generated/formatted_capture.csv"
-# names = ['src', 'dst', 'id', 'checksum',]
+names = ['version', 'ihl', 'tos', 'len', 'id', 'flags', 'frag', 'ttl', 'proto', 'chksum', 'src', 'dst']
 
-dataset = read_csv(url)
+dataset = read_csv(url, header=1)
 
 array = dataset.values
 
-X = array[:,3:4]
+# 
+X = array[:]
+
+# Column to be predicted (0 for inliers, 1 for outliers)
 y = array[:,4]
 
 

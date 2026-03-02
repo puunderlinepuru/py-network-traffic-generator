@@ -19,7 +19,7 @@ elif (sys.argv[1] == 'laptop'):
 script_path = sys.argv[0]
 script_directory = os.path.dirname(os.path.abspath(script_path))
 
-resource_path = script_directory + 'generated'
+resource_path = script_directory + r'/generated'
 if not os.path.exists(resource_path):
     os.makedirs(resource_path)
 
@@ -36,12 +36,15 @@ port = 12345
 # packets = sniff(prn=lambda x: x.summary(), filter=f"tcp and dst port {port}", count=count, iface=interface)
 
 # ICMP
-packets = sniff(prn=lambda x: x.summary(), filter=f"icmp", count=count, iface=interface)
+packets = sniff(prn=lambda x: x.summary(), filter=f"icmp and src not 10.0.0.1", count=count, iface=interface)
 
 print("Sniffing complete.")
 
 data = []
-packet_fields = packets[0][IP].fields.keys()
+json_packet = packets[0][IP].json()
+packet_disass = json.loads(json_packet)
+packet_fields = packet_disass.keys()
+
 
 
 json_packets = []
