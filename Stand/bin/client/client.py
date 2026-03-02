@@ -1,6 +1,8 @@
 from scapy.all import *
 import random
 
+from scapy.layers.inet import IP, TCP
+
 class TCPClient:
     def __init__(self, server_ip, server_port, chunk_size=512):
         self.server_ip = server_ip
@@ -81,7 +83,7 @@ class TCPClient:
 
         print("STILL LISTENING FOR A SERVER FIN")
 
-        sniff(iface="ens224",filter=f"tcp and dst port {self.local_port}", prn=self.handle_packet, store=0)
+        sniff(iface="eth0",filter=f"tcp and dst port {self.local_port}", prn=self.handle_packet, store=0)
 
     def handle_packet(self, packet):
 
