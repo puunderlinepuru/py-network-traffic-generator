@@ -13,8 +13,12 @@ json_file_path = f"generated/capture.json"
 # Define whether script is run from PC or Laptop
 if (sys.argv[1] == 'pc'):
     interface = 'Inner Ethernet'
+elif (sys.argv[1] == 'pc_local'):
+    interface = 'wlan0'
 elif (sys.argv[1] == 'laptop'):
     interface = 'wlan0'
+elif (sys.argv[1] == 'laptop_local'):
+    interface = 'lo'
 
 script_path = sys.argv[0]
 script_directory = os.path.dirname(os.path.abspath(script_path))
@@ -37,6 +41,9 @@ port = 12345
 
 # ICMP
 packets = sniff(prn=lambda x: x.summary(), filter=f"icmp and src not 10.0.0.1", count=count, iface=interface)
+
+# UDP
+# packets = sniff(prn=lambda x: x.summary(), filter=f"udp and src 10.235.118.137", count=count, iface=interface)
 
 print("Sniffing complete.")
 

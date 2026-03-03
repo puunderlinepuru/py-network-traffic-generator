@@ -14,7 +14,4 @@ def send_icmp(dest_ip, tos=0, src_ip="192.168.1.1", id=random.randint(1, 65535))
         print("No response received.")
 
 # Test the function with a destination IP, ToS=8 (Minimize Delay), source IP and random packet ID
-dest_ip = "127.0.0.1"
-
-for _ in range(30):
-    send_icmp(dest_ip=dest_ip, tos=8, src_ip="127.0.0.1")
+send_icmp(dest_ip="192.168.1.2", tos=8, src_ip="192.168.1.1")
