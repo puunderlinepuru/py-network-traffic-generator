@@ -1,5 +1,0 @@
-Activation:
-.\Scripts\activate 
-
-Deactivation:
-deactivate
