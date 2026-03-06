@@ -27,7 +27,7 @@ print("outliers_values: ", outliers_values)
 
 print("outliers: \n", data[outliers == -1], type(data[outliers == -1]))
 
-Display_data.dis()
+# Display_data.dis()
 
 # Create a box plot to visualize the data and highlight any potential outliers
 plt.boxplot(data[column], showfliers=True)
