@@ -37,10 +37,10 @@ print(f'capturing {count} packets')
 
 port = 12345
 # TCP
-# packets = sniff(prn=lambda x: x.summary(), filter=f"tcp and dst port {port}", count=count, iface=interface)
+packets = sniff(prn=lambda x: x.summary(), filter=f"tcp and dst port {port}", count=count, iface=interface)
 
 # ICMP
-packets = sniff(prn=lambda x: x.summary(), filter=f"icmp and src not 10.0.0.1", count=count, iface=interface)
+# packets = sniff(prn=lambda x: x.summary(), filter=f"icmp and src not 10.0.0.1", count=count, iface=interface)
 
 # UDP
 # packets = sniff(prn=lambda x: x.summary(), filter=f"udp and src 10.235.118.137", count=count, iface=interface)
@@ -72,18 +72,6 @@ with open(csv_file_path, mode='w', newline='') as csv_file:
         
         writer.writerow(packet_disass.values())
     
-
-
-
-# choice = input("Press Enter to exit")
-# while choice != "":
-#     if choice == "packet":
-#         print(packet_disass)
-#     elif choice == "stega":
-#         print(packet_disass["src"])
-#         print(packet_disass["tos"])
-#         print(packet_disass['payload']['id'])
-#     choice = input("Press Enter to exit")
 
 
 
