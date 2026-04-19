@@ -1,0 +1,31 @@
+tests:
+  - 1:
+    contamination: 0.001
+    src: 0
+    tos: 2
+    id: 7
+  - 2:
+    contamination: 0.001
+    src: 10
+    tos: 2
+    id: 9
+  - 3:
+    contamination: 0.001
+    src: 10
+    tos: 2
+    id: 9
+  - 4:
+    contamination: 0.001
+    src: 10
+    tos: 2
+    id: 0
+  - 5:
+    contamination: 0.001
+    src: 10
+    tos: 2
+    id: 9
+
+    9
+    0
+    9
+    7

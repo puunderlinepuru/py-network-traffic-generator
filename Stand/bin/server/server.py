@@ -4,7 +4,7 @@ import time
 from scapy.layers.inet import IP, TCP
 
 class TCPServer:
-    def __init__(self, host='10.0.0.1', port=12345):
+    def __init__(self, host='192.168.0.12', port=12345):
         self.host = host
         self.port = port
         self.server_seq_num = 5000
@@ -13,7 +13,7 @@ class TCPServer:
 
     def start(self):
         print(f"STARTING TCP SERVER ON {self.host}:{self.port}")
-        sniff(iface="Inner Ethernet",filter=f"tcp and dst port {self.port}", prn=self.handle_packet, store=0)
+        sniff(iface="Outer Ethernet",filter=f"tcp and dst port {self.port}", prn=self.handle_packet, store=0)
 
     def handle_packet(self, packet):
 

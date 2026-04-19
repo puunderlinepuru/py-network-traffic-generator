@@ -10,11 +10,16 @@ import json
 csv_file_path = f"generated/capture.csv"
 json_file_path = f"generated/capture.json"
 
+# Source - https://stackoverflow.com/a/24196955
+# Posted by Martin Konecny, modified by community. See post 'Timeline' for change history
+# Retrieved 2026-03-30, License - CC BY-SA 4.0
+
+
 # Define whether script is run from PC or Laptop
 if (sys.argv[1] == 'pc'):
-    interface = 'Inner Ethernet'
+    interface = 'Подключение по локальной сети'
 elif (sys.argv[1] == 'pc_local'):
-    interface = 'wlan0'
+    interface = 'Inner Ethernet'
 elif (sys.argv[1] == 'laptop'):
     interface = 'wlan0'
 elif (sys.argv[1] == 'laptop_local'):
@@ -37,10 +42,10 @@ print(f'capturing {count} packets')
 
 port = 12345
 # TCP
-packets = sniff(prn=lambda x: x.summary(), filter=f"tcp and dst port {port}", count=count, iface=interface)
+packets = sniff(prn=lambda x: x.summary(), filter=f"tcp", count=count, iface=interface)
 
 # ICMP
-# packets = sniff(prn=lambda x: x.summary(), filter=f"icmp and src not 10.0.0.1", count=count, iface=interface)
+# packets = sniff(prn=lambda x: x.summary(), filter=f"icmp and src not 192.168.0.12", count=count, iface=interface)
 
 # UDP
 # packets = sniff(prn=lambda x: x.summary(), filter=f"udp and src 10.235.118.137", count=count, iface=interface)
