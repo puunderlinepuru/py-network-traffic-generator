@@ -1,5 +1,5 @@
-Stand/bin/generated/capture.csv
-Stand/bin/generated/formatted_capture.csv
+Stand\bin\server\generated\formatted_capture.csv
+Stand\bin\server\generated\capture.csv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
