@@ -1,4 +1,4 @@
-import ICMP_generator
+import ICMPv4_generator
 import TCP_client
 
 menu_choice = int(input(
@@ -25,7 +25,7 @@ while(menu_choice != 0):
             stego_src = input("Changed Source IP:")
             dst = input("Destination IP: ")
             normal_tos = int(input("ToS: "))
-            ICMP_generator.generate_traffic_src_ip(count,stego_amount,normal_src,stego_src,dst, normal_tos)
+            ICMPv4_generator.generate_traffic_src_ip(count,stego_amount,normal_src,stego_src,dst, normal_tos)
         
         # ToS
         if(submenu_choice == 2):
@@ -35,7 +35,7 @@ while(menu_choice != 0):
             dst = input("Destination IP: ")
             normal_tos = int(input("Normal ToS: "))
             stego_tos = int(input("Changed ToS: "))
-            ICMP_generator.ICMP_generate_traffic_tos(count, stego_amount, normal_src, dst, normal_tos, stego_tos)
+            ICMPv4_generator.ICMP_generate_traffic_tos(count, stego_amount, normal_src, dst, normal_tos, stego_tos)
 
     if(menu_choice == 2):
         submenu_choice = int()

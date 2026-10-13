@@ -1,6 +1,9 @@
 from scapy.all import *
 import random
 
+from scapy.modules.nmap import ICMP
+from scapy.modules.nmap import IP
+
 # ip_src_normal = "127.0.0.1"
 # ip_src_sus = "127.0.0.1"
 # ip_dst = "127.0.0.1"
