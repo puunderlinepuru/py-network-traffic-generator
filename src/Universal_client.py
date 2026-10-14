@@ -25,7 +25,7 @@ while(menu_choice != 0):
             stego_src = input("Changed Source IP:")
             dst = input("Destination IP: ")
             normal_tos = int(input("ToS: "))
-            ICMPv4_generator.generate_traffic_src_ip(count,stego_amount,normal_src,stego_src,dst, normal_tos)
+            ICMPv4_generator.ICMP_generate_traffic_src_ip(count,stego_amount,normal_src,stego_src,dst, normal_tos)
         
         # ToS
         if(submenu_choice == 2):

@@ -19,9 +19,9 @@ else:
 print(f'sending {count} packets')
 
 
-def send_icmp(dest_ip, tos=0, src_ip="192.168.1.1", id=random.randint(1, 65535)):
+def send_icmp(dest_ip, tos=0, src_ip="192.168.1.1", time_to_live=64, id=random.randint(1, 65535)):
     # Create an ICMP packet with the required fields
-    icmp = IP(dst=dest_ip, tos=tos, src=src_ip, id=id)/ICMP()/"Hello, World!"
+    icmp = IP(dst=dest_ip, ttl=time_to_live, tos=tos, src=src_ip, id=id)/ICMP()/"Hello, World!"
 
     # Send the packet and get the response
     resp = sr1(icmp)
