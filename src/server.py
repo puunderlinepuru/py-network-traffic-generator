@@ -70,8 +70,8 @@ class TCPServer:
                     exit()
 
 if __name__ == "__main__":
-    srv_address='127.0.0.1'
+    srv_address='192.168.1.64'
     srv_port=12345
-    interface = 'lo'
+    interface = "Беспроводная сеть"
     server = TCPServer(host=srv_address, port=srv_port, iface=interface)
     server.start()
