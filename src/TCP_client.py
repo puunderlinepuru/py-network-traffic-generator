@@ -4,7 +4,7 @@ import random
 from scapy.layers.inet import IP, TCP
 
 class TCPClient:
-    def __init__(self, server_ip, server_port, chunk_size=512):
+    def __init__(self, server_ip, server_port, chunk_size=512, iface='wlan0'):
         self.server_ip = server_ip
         self.server_port = server_port
         self.local_port = random.randint(1024, 65535)
@@ -12,6 +12,7 @@ class TCPClient:
         self.client_ack_num = None
         self.server_seq_num = None
         self.chunk_size = 1400
+        self.interface = iface
 
     def initiate_connection(self):
         print(f"SENDING SYN PACKET")
@@ -83,7 +84,7 @@ class TCPClient:
 
         print("STILL LISTENING FOR A SERVER FIN")
 
-        sniff(iface="eth0",filter=f"tcp and dst port {self.local_port}", prn=self.handle_packet, store=0)
+        sniff(iface=self.interface,filter=f"tcp and dst port {self.local_port}", prn=self.handle_packet, store=0)
 
     def handle_packet(self, packet):
 
@@ -107,5 +108,7 @@ class TCPClient:
         self.terminate_connection()
 
 if __name__ == "__main__":
-    client = TCPClient(server_ip="10.0.0.1", server_port=12345)
+    srv_address='127.0.0.1'
+    srv_port=12345
+    client = TCPClient(server_ip=srv_address, server_port=srv_port)
     client.send_file("file.txt")

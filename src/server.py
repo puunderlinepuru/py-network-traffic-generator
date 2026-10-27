@@ -4,16 +4,18 @@ import time
 from scapy.layers.inet import IP, TCP
 
 class TCPServer:
-    def __init__(self, host='192.168.0.12', port=12345):
+
+    def __init__(self, host='192.168.0.12', port=12345, iface="Outer Ethernet"):
         self.host = host
         self.port = port
+        self.interface = iface
         self.server_seq_num = 5000
         self.client_seq_num = None
         self.client_ack_num = None
 
     def start(self):
         print(f"STARTING TCP SERVER ON {self.host}:{self.port}")
-        sniff(iface="Outer Ethernet",filter=f"tcp and dst port {self.port}", prn=self.handle_packet, store=0)
+        sniff(iface=self.interface,filter=f"tcp and dst port {self.port}", prn=self.handle_packet, store=0)
 
     def handle_packet(self, packet):
 
@@ -51,9 +53,9 @@ class TCPServer:
                 fin_packet = IP(dst=packet[IP].src) / TCP(sport=packet[TCP].dport, dport=packet[TCP].sport, flags='A', seq=self.server_seq_num, ack=self.client_seq_num + 1)
                 send(fin_packet, verbose=0)
 
-                # print(f"UPDATING MY SEQUENCE NUMBER")
+                print(f"UPDATING MY SEQUENCE NUMBER")
 
-                # self.server_seq_num += 1
+                self.server_seq_num += 1
 
                 print(f"SENDING SERVER FIN")
 
@@ -68,5 +70,8 @@ class TCPServer:
                     exit()
 
 if __name__ == "__main__":
-    server = TCPServer()
+    srv_address='127.0.0.1'
+    srv_port=12345
+    interface = 'lo'
+    server = TCPServer(host=srv_address, port=srv_port, iface=interface)
     server.start()
