@@ -8,7 +8,8 @@ class TCPClient:
         self.server_ip = server_ip
         self.server_port = server_port
         self.local_port = random.randint(1024, 65535)
-        self.client_seq_num = 1000
+        # self.client_seq_num = 1000
+        self.client_seq_num = 0
         self.client_ack_num = None
         self.server_seq_num = None
         self.chunk_size = 1400
@@ -108,7 +109,8 @@ class TCPClient:
         self.terminate_connection()
 
 if __name__ == "__main__":
-    srv_address='127.0.0.1'
+    srv_address='192.168.1.2'
     srv_port=12345
-    client = TCPClient(server_ip=srv_address, server_port=srv_port)
+    interface="Беспроводная сеть"
+    client = TCPClient(server_ip=srv_address, server_port=srv_port, iface=interface)
     client.send_file("file.txt")

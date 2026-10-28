@@ -1,82 +1,70 @@
-#!/usr/bin/env python3
-
 from scapy.all import *
 import time
-import sys
 
-def tcp_server():
-    # Read payload from file
-    try:
-        with open('./file.txt', 'r') as f:
-            payload = f.read()
-    except FileNotFoundError:
-        print("Error: ./file.txt not found")
-        return
-    
-    # Server configuration
-    client_ip = "192.168.1.68"   # Change to your client IP
-    client_port = 54321
-    server_ip = "192.168.1.64"  # Change to your server IP
-    server_port = 12345
-    
-    interface="Беспроводная сеть"
-    
-    print(f"Starting TCP server on {server_ip}:{server_port}")
-    print(f"Waiting for connection from {client_ip}:{client_port}")
-    
-    def handle_connection(packet):
-        if packet.haslayer(TCP) and packet.haslayer(IP):
-            tcp_layer = packet[TCP]
-            ip_layer = packet[IP]
-            
-            # Check if it's a SYN packet
-            if tcp_layer.flags == 2:  # SYN
-                print(f"Received SYN from {ip_layer.src}:{tcp_layer.sport}")
-                
-                # Send SYN-ACK
-                syn_ack = IP(dst=ip_layer.src, src=server_ip) / \
-                         TCP(sport=server_port, dport=tcp_layer.sport, 
-                             flags="SA", seq=1000, ack=tcp_layer.seq + 1)
-                send(syn_ack, iface=interface)
-                print("Sent SYN-ACK")
-                
-            # Check if it's an ACK packet (connection established)
-            elif tcp_layer.flags == 16:  # ACK
-                print(f"Received ACK from {ip_layer.src}:{tcp_layer.sport}")
-                
-                # Send payload data
-                data_packet = IP(dst=ip_layer.src, src=server_ip) / \
-                             TCP(sport=server_port, dport=tcp_layer.sport,
-                                 flags="PA", seq=1001, ack=tcp_layer.seq + 1) / \
-                             Raw(load=payload)
-                send(data_packet, iface=interface)
-                print("Sent payload data")
-                
-                # Send FIN packet
-                fin_packet = IP(dst=ip_layer.src, src=server_ip) / \
-                            TCP(sport=server_port, dport=tcp_layer.sport,
-                                flags="FA", seq=1001 + len(payload), ack=tcp_layer.seq + 1)
-                send(fin_packet, iface=interface)
-                print("Sent FIN packet")
-                
-                # Wait for FIN-ACK
-                def handle_fin_ack(pkt):
-                    if pkt.haslayer(TCP) and pkt[TCP].flags == 17:  # FIN-ACK
-                        print("Received FIN-ACK, connection closed")
-                        
-                # Listen for FIN-ACK for a short time
-                sniff(iface=interface, filter=f"tcp and host {client_ip} and port {client_port}", 
-                      lfilter=lambda x: x.haslayer(TCP) and x[TCP].flags == 17, 
-                      timeout=5, prn=handle_fin_ack)
-                
-    # Start sniffing for TCP packets
-    try:
-        print("Listening for TCP connection...")
-        sniff(iface=interface, filter=f"tcp and host {client_ip} and port {server_port}", 
-              lfilter=lambda x: x.haslayer(TCP), 
-              prn=handle_connection, timeout=30)
-    except KeyboardInterrupt:
-        print("\nServer stopped")
+class TCPServer:
+    def __init__(self, host='0.0.0.0', port=12345):
+        self.host = host
+        self.port = port
+        self.server_seq_num = 5000
+        self.client_seq_num = None
+        self.client_ack_num = None
+
+    def start(self):
+        print(f"STARTING TCP SERVER ON {self.host}:{self.port}")
+        sniff(iface="Беспроводная сеть",filter=f"tcp and dst port {self.port}", prn=self.handle_packet, store=0)
+
+    def handle_packet(self, packet):
+
+        if packet.haslayer(IP) and packet.haslayer(TCP):
+
+            self.client_seq_num = packet[TCP].seq
+            self.client_ack_num = packet[TCP].ack
+
+            if packet[TCP].flags == 'S':  # SYN flag
+                print(f"RECEIVED A SYN")
+                print(f"SENDING A SYN-ACK")
+
+                syn_ack_packet = IP(dst=packet[IP].src) / TCP(sport=self.port, dport=packet[TCP].sport, flags='SA', seq=self.server_seq_num, ack=self.client_seq_num + 1)
+                send(syn_ack_packet, verbose=0)
+
+                print(f"UPDATING MY SEQUENCE NUMBER")
+
+                self.server_seq_num += 1
+
+            elif packet[TCP].flags == 'A':  # ACK flag
+                print(f"RECEIVED AN ACK FOR SYN-ACK")
+                print(f"THREE-WAY HANDSHAKE COMPLETE")
+
+            elif packet[TCP].flags == 'PA':  # PSH and ACK flags
+                print(f"RECEIVED SOME DATA: {packet[TCP].payload.load.decode()}")
+                print(f"SENDING AN ACK FOR THIS CHUNK OF DATA")
+
+                ack_packet = IP(dst=packet[IP].src) / TCP(sport=self.port, dport=packet[TCP].sport, flags='A', seq=self.server_seq_num, ack=self.client_seq_num + len(packet[TCP].payload.load))
+                send(ack_packet, verbose=0)
+
+            elif packet[TCP].flags == 'FA':  # FIN flag
+                print(f"RECEIVED A FIN FROM CLIENT")
+                print(f"SENDING ACK TO FIN-ACK ")
+
+                fin_packet = IP(dst=packet[IP].src) / TCP(sport=packet[TCP].dport, dport=packet[TCP].sport, flags='A', seq=self.server_seq_num, ack=self.client_seq_num + 1)
+                send(fin_packet, verbose=0)
+
+                # print(f"UPDATING MY SEQUENCE NUMBER")
+
+                # self.server_seq_num += 1
+
+                print(f"SENDING SERVER FIN")
+
+                time.sleep(1)
+
+                fin_packet = IP(dst=packet[IP].src) / TCP(sport=packet[TCP].dport, dport=packet[TCP].sport, flags='FA', seq=self.server_seq_num, ack=self.client_seq_num + 1 )
+                fin_ack_response = sr1(fin_packet, verbose=False)
+
+                if fin_ack_response and fin_ack_response.haslayer(TCP) and fin_ack_response[TCP].flags == 'A':  # FIN-ACK flags
+                    print(f"RECEIVED AN ACK FOR SERVER FIN: MY CONNECTION IS CLOSED")
+                    print(f"EXITING")
+                    exit()
 
 if __name__ == "__main__":
-    tcp_server()
+    server = TCPServer()
+    server.start()

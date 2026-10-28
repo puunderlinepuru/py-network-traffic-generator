@@ -4,9 +4,9 @@ from scapy.layers.inet import IP, TCP
 import time
 
 # ── Configuration ──────────────────────────────────────────────
-LAN_IP    = "192.168.1.100"   # source address on LAN
-SRV_IP    = "203.0.113.10"    # server address
-PORT      = 80
+LAN_IP    = "192.168.1.68"   # source address on LAN
+SRV_IP    = "192.168.1.2"    # server address
+PORT      = 12345
 # ───────────────────────────────────────────────────────────────
 
 # seq/ack adjustment table: (src_ip, dst_ip, is_syn) -> (seq_delta, ack_delta)
@@ -33,12 +33,15 @@ def _forward(pkt, src_ip, dst_ip, new_src, new_dst):
     # recompute
     # original seq already set; just send
     p[TCP].chksum = None
-    send(p, iface="eth0")
+    send(p, iface="Беспроводная сеть")
 
 
 def handle(pkt):
+    print("got packet")
+    # print(pkt.show)
     ip  = pkt[IP]
     tcp = pkt[TCP]
+    print("tcp flag: ", tcp.flags)
     is_syn = (tcp.flags & 0x02) != 0
     seq_delta, ack_delta = _get_delta(pkt, is_syn)
 
@@ -51,45 +54,50 @@ def handle(pkt):
         # outgoing
         _set_delta(pkt, 0, 0, new_icn - old_icn)
         # build forwarded packet
-        f = IP(src=LAN_IP, dst=SRV_IP, proto=6) / \
-            TCP(seq=new_icn, ack=tcp.ack,
+        f = IP(src="192.168.1.64", dst=SRV_IP, proto=6) / \
+            TCP(dport=12345, seq=new_icn, ack=tcp.ack,
                 flags=tcp.flags, options=tcp.options)
         f[TCP].chksum = None
-        send(f, iface="eth0")
+        print("sending: \n", f.show)
+        send(f, iface="Беспроводная сеть")
         return
 
     # ── subsequent: LAN → server ──
     if ip.src == LAN_IP:
+        print("subsequent")
         _set_delta(pkt, 0, 0, tcp.seq + seq_delta - tcp.seq + ack_delta - tcp.ack + tcp.ack - tcp.ack)
         # simpler:
         # new seq = seq + (new_icn - old_icn) = seq + seq_delta (syn=0 row)
         # new ack = ack + ack_delta
-        f = IP(src=LAN_IP, dst=SRV_IP, proto=6) / \
-            TCP(seq=tcp.seq + seq_delta, ack=tcp.ack + ack_delta,
+        f = IP(src="192.168.1.64", dst=SRV_IP, proto=6) / \
+            TCP(dport=12345, seq=tcp.seq + seq_delta, ack=tcp.ack + ack_delta,
                 flags=tcp.flags, options=tcp.options)
         f[TCP].chksum = None
-        send(f, iface="eth0")
+        send(f, iface="Беспроводная сеть")
         # save
         _set_delta(pkt, 0, seq_delta, ack_delta)
         return
 
+    if ip.dst == "192.168.1.64":
+        print("response back")
     # ── server → LAN ──
     # (handled by the 0-row stored above)
     # new seq = seq + seq_delta(0)
     # new ack = ack + ack_delta(0)
-    f = IP(src=SRV_IP, dst=LAN_IP, proto=6) / \
-        TCP(seq=tcp.seq + seq_delta, ack=tcp.ack + ack_delta,
+    print("aux")
+    f = IP(src="192.168.1.64", dst=LAN_IP, proto=6) / \
+        TCP(dport=12345, seq=tcp.seq + seq_delta, ack=tcp.ack + ack_delta,
             flags=tcp.flags, options=tcp.options)
     f[TCP].chksum = None
-    send(f, iface="eth0")
+    send(f, iface="Беспроводная сеть")
 
 
 def main():
     print(f"Listening on {LAN_IP}:{PORT}  →  {SRV_IP}:{PORT}")
     while True:
-        sniff(iface="eth0",
-              filter=f"src host {LAN_IP} and dst port {PORT} or "
-                     f"src host {SRV_IP} and dst port {PORT}",
+        sniff(iface="Беспроводная сеть",
+              filter=f"src host {LAN_IP} and dst host 192.168.1.64 or "
+                     f"src host {SRV_IP} and dst host 192.168.1.64",
               prn=handle)
 
 
