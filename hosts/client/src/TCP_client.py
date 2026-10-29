@@ -1,19 +1,24 @@
 from scapy.all import *
 import random
+from lorem.text import TextLorem
 
 from scapy.layers.inet import IP, TCP
 
-class TCPClient:
-    def __init__(self, server_ip, server_port, chunk_size=512, iface='wlan0'):
+class TCPSession:
+    def __init__(self, server_ip, server_port, chunk_size=512, iface='wlan0', icn=random.randint(1, 4294967295)):
         self.server_ip = server_ip
         self.server_port = server_port
         self.local_port = random.randint(1024, 65535)
         # self.client_seq_num = 1000
-        self.client_seq_num = 0
+        self.client_seq_num = icn
         self.client_ack_num = None
         self.server_seq_num = None
         self.chunk_size = 1400
         self.interface = iface
+
+    def set_icn(self, new_icn):
+        self.client_seq_num = new_icn
+        self.local_port = random.randint(1024, 65535)
 
     def initiate_connection(self):
         print(f"SENDING SYN PACKET")
@@ -101,6 +106,12 @@ class TCPClient:
             print(f"EXITING")
 
             exit()
+            
+    def send_message(self, message):
+        message_bytes = str.encode(message)
+        self.send_payload(message_bytes)
+        self.terminate_connection()
+        print("check")
 
     def send_file(self, file_path):
         with open(file_path, 'rb') as f:
@@ -109,8 +120,23 @@ class TCPClient:
         self.terminate_connection()
 
 if __name__ == "__main__":
-    srv_address='192.168.1.2'
+    srv_address='192.168.1.68'
     srv_port=12345
     interface="Беспроводная сеть"
-    client = TCPClient(server_ip=srv_address, server_port=srv_port, iface=interface)
-    client.send_file("file.txt")
+    # client = TCPSession(server_ip=srv_address, server_port=srv_port, iface=interface, icn=1000)
+    
+    base_icn_values = []
+    crypto_message = "test message"
+    for char in crypto_message:
+        base_icn_values.append(random.randint(1, 4294967295))
+    print("base ICN values: ")
+    
+    counter = 0
+    for letter in crypto_message:
+        print("iteration ", counter)
+        client = TCPSession(server_ip=srv_address, server_port=srv_port, iface=interface, icn=base_icn_values[counter] + int.from_bytes(letter.encode()))
+        print("ICN is: ", base_icn_values[counter], " + ", int.from_bytes(letter.encode()))
+        lorem = TextLorem(srange=(2,50))
+        payload = lorem.sentence()
+        client.send_message(payload)
+        counter+=1

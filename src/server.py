@@ -66,11 +66,12 @@ class TCPServer:
 
                 if fin_ack_response and fin_ack_response.haslayer(TCP) and fin_ack_response[TCP].flags == 'A':  # FIN-ACK flags
                     print(f"RECEIVED AN ACK FOR SERVER FIN: MY CONNECTION IS CLOSED")
-                    print(f"EXITING")
-                    exit()
+                    print(f"Waiting for another connection")
+                    self.start
+                    # exit()
 
 if __name__ == "__main__":
-    srv_address='192.168.1.64'
+    srv_address='0.0.0.0'
     srv_port=12345
     interface = "Беспроводная сеть"
     server = TCPServer(host=srv_address, port=srv_port, iface=interface)
